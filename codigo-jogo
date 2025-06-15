@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprenda a Tabela Periódica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f8ff;
+        }
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Descubra o Elemento!</h1>
+        <p id="elemento-distribuicao"></p>
+        <div>
+            <label for="periodo">Período:</label>
+            <input type="number" id="periodo" min="1" max="7">
+        </div>
+        <div>
+            <label for="bloco">Bloco:</label>
+            <select id="bloco">
+                <option value="s">s</option>
+                <option value="p">p</option>
+                <option value="d">d</option>
+                <option value="f">f</option>
+            </select>
+        </div>
+        <button onclick="verificarResposta()">Verificar</button>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        // Base de dados simplificada
+        const elementos = [
+            { nome: "Hidrogênio", distribuicao: "1s¹", periodo: 1, bloco: "s" },
+            { nome: "Oxigênio", distribuicao: "1s² 2s² 2p⁴", periodo: 2, bloco: "p" },
+            { nome: "Ferro", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶", periodo: 4, bloco: "d" }
+        ];
+
+        let elementoAtual;
+
+        function gerarElemento() {
+            elementoAtual = elementos[Math.floor(Math.random() * elementos.length)];
+            document.getElementById("elemento-distribuicao").textContent = 
+                `Distribuição Eletrônica: ${elementoAtual.distribuicao}`;
+            document.getElementById("feedback").textContent = "";
+        }
+
+        function verificarResposta() {
+            const periodo = parseInt(document.getElementById("periodo").value);
+            const bloco = document.getElementById("bloco").value;
+            const feedback = document.getElementById("feedback");
+
+            if (periodo === elementoAtual.periodo && bloco === elementoAtual.bloco) {
+                feedback.textContent = `Correto! O elemento é ${elementoAtual.nome}.`;
+                feedback.style.color = "green";
+                setTimeout(gerarElemento, 2000);
+            } else {
+                feedback.textContent = `Incorreto. Tente novamente! Dica: Período = última camada, Bloco = subnível mais energético.`;
+                feedback.style.color = "red";
+            }
+        }
+
+        // Iniciar o jogo
+        window.onload = gerarElemento;
+    </script>
+</body>
+</html>
