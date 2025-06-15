@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprenda a Tabela Periódica</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .game-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .bloco-s { color: #e74c3c; font-weight: bold; }
+        .bloco-p { color: #3498db; font-weight: bold; }
+        .bloco-d { color: #2ecc71; font-weight: bold; }
+        .bloco-f { color: #9b59b6; font-weight: bold; }
+        #tabela-periodica {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        #tabela-periodica td {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 10px;
+            padding: 0;
+            position: relative;
+        }
+        #tabela-periodica button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        #tabela-periodica button:hover {
+            background-color: #f0f0f0;
+        }
+        .elemento-atual {
+            background-color: #fffde7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .score {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .modo-jogo {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        .btn-modo {
+            margin: 5px;
+            padding: 10px 20px;
+        }
+        .selected {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-container text-center" id="tela-inicial">
+            <h1 class="text-primary">🧪 Aprenda a Tabela Periódica</h1>
+            <p class="lead">Escolha um modo de jogo:</p>
+            
+            <div class="d-flex justify-content-center flex-wrap">
+                <button class="btn btn-primary btn-modo" onclick="iniciarJogo('modo1')">
+                    Modo 1: Adivinhe Período e Bloco
+                </button>
+                <button class="btn btn-success btn-modo" onclick="iniciarJogo('modo2')">
+                    Modo 2: Posicione na Tabela
+                </button>
+            </div>
+        </div>
+
+        <!-- Modo 1: Adivinhe Período e Bloco -->
+        <div class="game-container text-center modo-jogo" id="modo1">
+            <h1 class="text-primary">🧪 Descubra o Elemento Químico!</h1>
+            
+            <div class="score">
+                <span class="badge bg-primary">Acertos: <span id="acertos">0</span></span>
+                <span class="badge bg-success ms-2">Sequência: <span id="sequencia">0</span></span>
+            </div>
+            
+            <div class="elemento-atual">
+                <p id="elemento-distribuicao" class="lead fw-bold mb-1"></p>
+                <p id="dica" class="text-muted small"></p>
+            </div>
+
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-3 mb-3">
+                    <label for="periodo" class="form-label">Período (1-7):</label>
+                    <input type="number" id="periodo" class="form-control text-center" min="1" max="7">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="bloco" class="form-label">Bloco:</label>
+                    <select id="bloco" class="form-select text-center">
+                        <option value="s" class="bloco-s">s</option>
+                        <option value="p" class="bloco-p">p</option>
+                        <option value="d" class="bloco-d">d</option>
+                        <option value="f" class="bloco-f">f</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-4">
+                <button class="btn btn-success px-4" onclick="verificarResposta()">Verificar</button>
+                <button class="btn btn-outline-primary px-4" onclick="gerarElemento()">Pular</button>
+                <button class="btn btn-secondary px-4" onclick="voltarInicio()">Voltar</button>
+            </div>
+
+            <p id="feedback" class="mt-3 fw-bold"></p>
+        </div>
+
+        <!-- Modo 2: Posicione na Tabela -->
+        <div class="game-container text-center modo-jogo" id="modo2">
+            <h1 class="text-primary">🧪 Posicione o Elemento na Tabela!</h1>
+            
+            <div class="score">
+                <span class="badge bg-primary">Acertos: <span id="acertos2">0</span></span>
+                <span class="badge bg-success ms-2">Sequência: <span id="sequencia2">0</span></span>
+            </div>
+            
+            <div class="elemento-atual">
+                <p id="elemento-distribuicao-2" class="lead fw-bold mb-1"></p>
+                <p id="dica-2" class="text-muted small"></p>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table id="tabela-periodica-interativa"></table>
+            </div>
+
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-4">
+                <button class="btn btn-outline-primary px-4" onclick="gerarElementoModo2()">Novo Elemento</button>
+                <button class="btn btn-secondary px-4" onclick="voltarInicio()">Voltar</button>
+            </div>
+
+            <p id="feedback-2" class="mt-3 fw-bold"></p>
+        </div>
+    </div>
+
+    <script>
+        // Elementos para ambos os modos
+        const elementos = [
+            { nome: "Hidrogênio", simbolo: "H", distribuicao: "1s¹", periodo: 1, grupo: 1, bloco: "s", familia: "Não-metal" },
+            { nome: "Hélio", simbolo: "He", distribuicao: "1s²", periodo: 1, grupo: 18, bloco: "s", familia: "Gás Nobre" },
+            { nome: "Lítio", simbolo: "Li", distribuicao: "1s² 2s¹", periodo: 2, grupo: 1, bloco: "s", familia: "Metal Alcalino" },
+            { nome: "Berílio", simbolo: "Be", distribuicao: "1s² 2s²", periodo: 2, grupo: 2, bloco: "s", familia: "Metal Alcalino-Terroso" },
+            { nome: "Boro", simbolo: "B", distribuicao: "1s² 2s² 2p¹", periodo: 2, grupo: 13, bloco: "p", familia: "Semimetal" },
+            { nome: "Carbono", simbolo: "C", distribuicao: "1s² 2s² 2p²", periodo: 2, grupo: 14, bloco: "p", familia: "Não-metal" },
+            { nome: "Nitrogênio", simbolo: "N", distribuicao: "1s² 2s² 2p³", periodo: 2, grupo: 15, bloco: "p", familia: "Não-metal" },
+            { nome: "Oxigênio", simbolo: "O", distribuicao: "1s² 2s² 2p⁴", periodo: 2, grupo: 16, bloco: "p", familia: "Não-metal" },
+            { nome: "Flúor", simbolo: "F", distribuicao: "1s² 2s² 2p⁵", periodo: 2, grupo: 17, bloco: "p", familia: "Halogênio" },
+            { nome: "Neônio", simbolo: "Ne", distribuicao: "1s² 2s² 2p⁶", periodo: 2, grupo: 18, bloco: "p", familia: "Gás Nobre" },
+            { nome: "Sódio", simbolo: "Na", distribuicao: "1s² 2s² 2p⁶ 3s¹", periodo: 3, grupo: 1, bloco: "s", familia: "Metal Alcalino" },
+            { nome: "Magnésio", simbolo: "Mg", distribuicao: "1s² 2s² 2p⁶ 3s²", periodo: 3, grupo: 2, bloco: "s", familia: "Metal Alcalino-Terroso" },
+            { nome: "Alumínio", simbolo: "Al", distribuicao: "1s² 2s² 2p⁶ 3s² 3p¹", periodo: 3, grupo: 13, bloco: "p", familia: "Metal" },
+            { nome: "Silício", simbolo: "Si", distribuicao: "1s² 2s² 2p⁶ 3s² 3p²", periodo: 3, grupo: 14, bloco: "p", familia: "Semimetal" },
+            { nome: "Fósforo", simbolo: "P", distribuicao: "1s² 2s² 2p⁶ 3s² 3p³", periodo: 3, grupo: 15, bloco: "p", familia: "Não-metal" },
+            { nome: "Enxofre", simbolo: "S", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁴", periodo: 3, grupo: 16, bloco: "p", familia: "Não-metal" },
+            { nome: "Cloro", simbolo: "Cl", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁵", periodo: 3, grupo: 17, bloco: "p", familia: "Halogênio" },
+            { nome: "Argônio", simbolo: "Ar", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶", periodo: 3, grupo: 18, bloco: "p", familia: "Gás Nobre" },
+            { nome: "Potássio", simbolo: "K", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹", periodo: 4, grupo: 1, bloco: "s", familia: "Metal Alcalino" },
+            { nome: "Cálcio", simbolo: "Ca", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s²", periodo: 4, grupo: 2, bloco: "s", familia: "Metal Alcalino-Terroso" },
+            { nome: "Ferro", simbolo: "Fe", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶", periodo: 4, grupo: 8, bloco: "d", familia: "Metal de Transição" },
+            { nome: "Cobre", simbolo: "Cu", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d¹⁰", periodo: 4, grupo: 11, bloco: "d", familia: "Metal de Transição" },
+            { nome: "Prata", simbolo: "Ag", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d¹⁰ 4p⁶ 5s¹ 4d¹⁰", periodo: 5, grupo: 11, bloco: "d", familia: "Metal de Transição" },
+            { nome: "Ouro", simbolo: "Au", distribuicao: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d¹⁰ 4p⁶ 5s² 4d¹⁰ 5p⁶ 6s¹ 4f¹⁴ 5d¹⁰", periodo: 6, grupo: 11, bloco: "d", familia: "Metal de Transição" }
+        ];
+
+        // Variáveis globais
+        let elementoAtual;
+        let tentativas = 0;
+        let acertos = 0;
+        let sequencia = 0;
+        let acertosModo2 = 0;
+        let sequenciaModo2 = 0;
+
+        // Funções para tela inicial
+        function iniciarJogo(modo) {
+            document.getElementById("tela-inicial").style.display = "none";
+            document.getElementById(modo).classList.add("active");
+            
+            if (modo === "modo1") {
+                gerarElemento();
+                document.getElementById("periodo").focus();
+            } else {
+                criarTabelaInterativa();
+                gerarElementoModo2();
+            }
+        }
+
+        function voltarInicio() {
+            document.querySelectorAll(".modo-jogo").forEach(el => {
+                el.classList.remove("active");
+            });
+            document.getElementById("tela-inicial").style.display = "block";
+        }
+
+        // Funções para Modo 1: Adivinhe Período e Bloco
+        function gerarElemento() {
+            elementoAtual = elementos[Math.floor(Math.random() * elementos.length)];
+            document.getElementById("elemento-distribuicao").textContent = 
+                `Distribuição Eletrônica: ${elementoAtual.distribuicao}`;
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("dica").textContent = "";
+            document.getElementById("periodo").value = "";
+            document.getElementById("bloco").value = "s";
+            tentativas = 0;
+        }
+
+        function verificarResposta() {
+            const periodo = parseInt(document.getElementById("periodo").value);
+            const bloco = document.getElementById("bloco").value;
+            const feedback = document.getElementById("feedback");
+
+            if (!periodo || periodo < 1 || periodo > 7) {
+                feedback.textContent = "Por favor, insira um período válido (1-7)";
+                feedback.style.color = "red";
+                return;
+            }
+
+            if (periodo === elementoAtual.periodo && bloco === elementoAtual.bloco) {
+                feedback.innerHTML = `✅ Correto! O elemento é <strong>${elementoAtual.nome} (${elementoAtual.simbolo})</strong>.`;
+                feedback.style.color = "green";
+                acertos++;
+                sequencia++;
+                document.getElementById("acertos").textContent = acertos;
+                document.getElementById("sequencia").textContent = sequencia;
+                tentativas = 0;
+                setTimeout(gerarElemento, 2000);
+            } else {
+                tentativas++;
+                sequencia = 0;
+                document.getElementById("sequencia").textContent = sequencia;
+                
+                if (tentativas >= 3) {
+                    feedback.innerHTML = `❌ O elemento era <strong>${elementoAtual.nome} (${elementoAtual.simbolo})</strong> - Período ${elementoAtual.periodo}, Bloco ${elementoAtual.bloco}.`;
+                    feedback.style.color = "orange";
+                    tentativas = 0;
+                    setTimeout(gerarElemento, 4000);
+                } else {
+                    feedback.textContent = "❌ Incorreto. Tente novamente!";
+                    feedback.style.color = "red";
+                    
+                    // Dar dicas após erros
+                    if (tentativas === 2) {
+                        document.getElementById("dica").textContent = 
+                            `Dica: Pertence à família dos ${elementoAtual.familia}`;
+                    }
+                }
+            }
+        }
+
+        // Funções para Modo 2: Posicione na Tabela
+        function criarTabelaInterativa() {
+            const tabela = document.getElementById("tabela-periodica-interativa");
+            tabela.innerHTML = "";
+            
+            // Cabeçalho com números dos grupos
+            const trHeader = document.createElement("tr");
+            trHeader.appendChild(document.createElement("th")); // Célula vazia no canto
+            for (let grupo = 1; grupo <= 18; grupo++) {
+                const th = document.createElement("th");
+                th.textContent = grupo;
+                th.style.width = "40px";
+                trHeader.appendChild(th);
+            }
+            tabela.appendChild(trHeader);
+            
+            // Linhas da tabela (períodos)
+            for (let periodo = 1; periodo <= 7; periodo++) {
+                const tr = document.createElement("tr");
+                
+                // Número do período no início da linha
+                const thPeriodo = document.createElement("th");
+                thPeriodo.textContent = periodo;
+                tr.appendChild(thPeriodo);
+                
+                // Células para cada grupo
+                for (let grupo = 1; grupo <= 18; grupo++) {
+                    const td = document.createElement("td");
+                    const button = document.createElement("button");
+                    
+                    button.onclick = function() {
+                        verificarPosicao(periodo, grupo);
+                    };
+                    
+                    td.appendChild(button);
+                    tr.appendChild(td);
+                }
+                
+                tabela.appendChild(tr);
+            }
+        }
+
+        function gerarElementoModo2() {
+            elementoAtual = elementos[Math.floor(Math.random() * elementos.length)];
+            document.getElementById("elemento-distribuicao-2").textContent = 
+                `Elemento: ${elementoAtual.nome} (${elementoAtual.simbolo}) - Distribuição: ${elementoAtual.distribuicao}`;
+            document.getElementById("feedback-2").textContent = "";
+            document.getElementById("dica-2").textContent = "";
+            
+            // Limpar seleção anterior
+            document.querySelectorAll("#tabela-periodica-interativa button").forEach(btn => {
+                btn.classList.remove("selected");
+            });
+        }
+
+        function verificarPosicao(periodoSelecionado, grupoSelecionado) {
+            const feedback = document.getElementById("feedback-2");
+            const buttons = document.querySelectorAll("#tabela-periodica-interativa button");
+            
+            // Limpar seleção anterior
+            buttons.forEach(btn => {
+                btn.classList.remove("selected");
+            });
+            
+            // Marcar a célula selecionada
+            const buttonIndex = (periodoSelecionado - 1) * 18 + (grupoSelecionado - 1);
+            buttons[buttonIndex].classList.add("selected");
+            
+            if (periodoSelecionado === elementoAtual.periodo && grupoSelecionado === elementoAtual.grupo) {
+                feedback.innerHTML = `✅ Correto! Você posicionou <strong>${elementoAtual.nome}</strong> no lugar certo!`;
+                feedback.style.color = "green";
+                acertosModo2++;
+                sequenciaModo2++;
+                document.getElementById("acertos2").textContent = acertosModo2;
+                document.getElementById("sequencia2").textContent = sequenciaModo2;
+                
+                setTimeout(gerarElementoModo2, 2000);
+            } else {
+                feedback.innerHTML = `❌ Incorreto. Tente novamente!`;
+                feedback.style.color = "red";
+                sequenciaModo2 = 0;
+                document.getElementById("sequencia2").textContent = sequenciaModo2;
+                
+                // Dar dica após alguns erros
+                document.getElementById("dica-2").textContent = 
+                    `Dica: Este elemento pertence ao bloco ${elementoAtual.bloco}`;
+            }
+        }
+
+        // Inicialização
+        window.onload = function() {
+            document.getElementById("tela-inicial").style.display = "block";
+        };
+    </script>
+</body>
+</html>
